@@ -1,0 +1,226 @@
+# Corporate Academy Discovery System - Git Ignore Configuration
+
+# ============================================
+# CREDENTIALS & AUTHENTICATION (CRITICAL - NEVER COMMIT)
+# ============================================
+
+# Google Sheets MCP credentials
+.claude/google-sheets-token.json
+.claude/google-sheets-credentials.json
+
+# ZoomInfo MCP credentials
+.claude/zoominfo-token.json
+.claude/zoominfo-credentials.json
+
+# MCP server configuration (contains sensitive paths)
+.mcp.json
+
+# Environment files
+.env
+.env.local
+.env.*.local
+*.env
+
+# API keys and secrets
+secrets/
+credentials/
+*.key
+*.pem
+*.p12
+
+# ============================================
+# TEMPORARY & RUNTIME FILES
+# ============================================
+
+# System temporary files
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+*.log.*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Claude Code temporary documentation
+claudedocs/temp/
+claudedocs/*.tmp
+
+# ============================================
+# PYTHON ARTIFACTS
+# ============================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ============================================
+# NODE.JS / JAVASCRIPT
+# ============================================
+
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Build outputs
+dist/
+build/
+
+# Package manager files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ============================================
+# IDE & EDITOR FILES
+# ============================================
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iml
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+
+# Vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# ============================================
+# MACOS SYSTEM FILES
+# ============================================
+
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# ============================================
+# WINDOWS SYSTEM FILES
+# ============================================
+
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ============================================
+# LINUX SYSTEM FILES
+# ============================================
+
+*~
+.directory
+.Trash-*
+.nfs*
+
+# ============================================
+# PROJECT-SPECIFIC EXCLUSIONS
+# ============================================
+
+# Research data exports (committed separately)
+exports/raw/
+exports/temp/
+
+# Large datasets (too big for Git)
+data/raw/*.csv
+data/raw/*.xlsx
+
+# Agent working directories
+agents/temp/
+agents/cache/
+
+# Test outputs
+test-results/
+screenshots/
+*.png
+*.jpg
+*.jpeg
+
+# Backup files
+backup/
+*.backup
+
+# ============================================
+# INCLUDED FILES (EXPLICITLY TRACK)
+# ============================================
+
+# Keep these even if they match patterns above:
+!CLAUDE.md
+!README.md
+!docs/**/*.md
+!scripts/**/*.py
+!agents/**/*.py
