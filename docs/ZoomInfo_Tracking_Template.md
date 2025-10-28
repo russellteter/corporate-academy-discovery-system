@@ -45,31 +45,31 @@ A: 2025-10-28T14:30:22 | B: ZoomInfo | C: enrich_company | D: 10 | E: 1 | F: 4 |
 
 **Remaining Budget (Column G):**
 ```
-=IF(B2="ZoomInfo", 5000-F2, "")
+=IF(B2="ZoomInfo", 250000-F2, "")
 ```
-- Subtracts running total from project budget (5,000)
+- Subtracts running total from project budget (250,000)
 
 **Conditional Formatting Rules:**
 
-**1. Green Status (Remaining_Budget > 1,000):**
+**1. Green Status (Remaining_Budget > 50,000):**
 - Range: G2:G1000
 - Format: Light green background (#D9EAD3)
-- Condition: `=$G2 > 1000`
+- Condition: `=$G2 > 50000`
 
-**2. Yellow Status (Remaining_Budget 200-1,000):**
+**2. Yellow Status (Remaining_Budget 25,000-50,000):**
 - Range: G2:G1000
 - Format: Yellow background (#FFF2CC)
-- Condition: `=AND($G2 >= 200, $G2 <= 1000)`
+- Condition: `=AND($G2 >= 25000, $G2 <= 50000)`
 
-**3. Red Status (Remaining_Budget < 200):**
+**3. Red Status (Remaining_Budget < 25,000):**
 - Range: G2:G1000
 - Format: Red background (#F4CCCC)
-- Condition: `=$G2 < 200`
+- Condition: `=$G2 < 25000`
 
-**4. Alert on High Usage (API_Calls_Used > 50):**
+**4. Alert on High Usage (API_Calls_Used > 5,000):**
 - Range: E2:E1000
 - Format: Orange background (#FCE5CD)
-- Condition: `=AND($B2="ZoomInfo", $E2 > 50)`
+- Condition: `=AND($B2="ZoomInfo", $E2 > 5000)`
 
 ---
 
@@ -81,10 +81,10 @@ A: 2025-10-28T14:30:22 | B: ZoomInfo | C: enrich_company | D: 10 | E: 1 | F: 4 |
 
 | Metric | Formula | Display Format |
 |--------|---------|----------------|
-| **Total API Calls Used** | `=SUMIF(Processing_Log!B:B,"ZoomInfo",Processing_Log!E:E)` | 1,234 calls |
-| **Project Budget** | `5000` | 5,000 calls |
-| **Remaining Budget** | `=5000-[Total API Calls]` | 3,766 calls |
-| **Budget Used (%)** | `=[Total API Calls]/5000*100` | 24.7% |
+| **Total API Calls Used** | `=SUMIF(Processing_Log!B:B,"ZoomInfo",Processing_Log!E:E)` | 125,450 calls |
+| **Project Budget** | `250000` | 250,000 calls |
+| **Remaining Budget** | `=250000-[Total API Calls]` | 124,550 calls |
+| **Budget Used (%)** | `=[Total API Calls]/250000*100` | 50.2% |
 | **Status** | `=IF([Budget Used]<60,"GREEN",IF([Budget Used]<80,"YELLOW","RED"))` | GREEN |
 
 **Usage by Tool:**
@@ -146,13 +146,13 @@ Planned Operation:
 
 Budget Check:
 - After Operation Total: [Running Total] + [Estimated Calls] = ?
-- Remaining After: 5000 - [After Operation Total] = ?
-- Percentage Used: [After Operation Total] / 5000 * 100 = ?%
+- Remaining After: 250000 - [After Operation Total] = ?
+- Percentage Used: [After Operation Total] / 250000 * 100 = ?%
 
 DECISION:
 [ ] PROCEED - Budget sufficient, operation approved
 [ ] REVIEW - Approaching 80%, discuss with user
-[ ] ABORT - Insufficient budget, use free sources
+[ ] ABORT - Insufficient budget, revise approach
 ```
 
 ### **2. Free Source Check**
@@ -193,8 +193,8 @@ operation_log = {
     "tool_name": "enrich_contact",  # or search_contacts, enrich_company, etc.
     "records_affected": 10,          # Number of contacts/companies
     "api_calls_used": 1,             # Actual API calls consumed
-    "running_total": 246,            # Previous total + this operation
-    "remaining_budget": 4754,        # 5000 - running_total
+    "running_total": 12450,          # Previous total + this operation
+    "remaining_budget": 237550,      # 250000 - running_total
     "operation_notes": "Batch 1/20: Enriched Agent 5 LinkedIn contacts with email/phone"
 }
 
@@ -211,9 +211,9 @@ add_rows(spreadsheet_id, "Processing_Log", [[
 ]])
 
 # Alert if approaching limits
-if operation_log["running_total"] >= 4000:
+if operation_log["running_total"] >= 200000:
     print("🚨 CRITICAL: 80%+ of budget used - Review with user!")
-elif operation_log["running_total"] >= 3500:
+elif operation_log["running_total"] >= 175000:
     print("⚠️ WARNING: 70%+ of budget used - Monitor closely")
 ```
 
@@ -228,29 +228,29 @@ elif operation_log["running_total"] >= 3500:
 
 ## Quick Stats
 - **This Week's Usage**: [X] API calls
-- **Running Total**: [Y] / 5,000 calls ([Z]%)
+- **Running Total**: [Y] / 250,000 calls ([Z]%)
 - **Remaining Budget**: [W] calls
 - **Status**: [GREEN/YELLOW/RED]
 
 ## Usage Breakdown
 | Date | Tool | Operations | API Calls | Records |
 |------|------|------------|-----------|---------|
-| Mon | enrich_contact | 5 | 5 | 50 |
-| Tue | search_contacts | 3 | 8 | 75 |
-| Wed | enrich_company | 2 | 2 | 20 |
-| Thu | enrich_contact | 8 | 8 | 80 |
-| Fri | lookup + search | 5 | 10 | 125 |
-| **TOTAL** | **-** | **23** | **33** | **350** |
+| Mon | enrich_contact | 50 | 500 | 5,000 |
+| Tue | search_contacts | 30 | 800 | 750 |
+| Wed | enrich_company | 20 | 200 | 2,000 |
+| Thu | enrich_contact | 80 | 800 | 8,000 |
+| Fri | lookup + search | 50 | 1,000 | 1,250 |
+| **TOTAL** | **-** | **230** | **3,300** | **17,000** |
 
 ## Top Operations This Week
-1. Enriched 225 contacts from Agent 5 (23 API calls)
-2. Validated 50 companies in Consolidated_Academies (5 API calls)
-3. Targeted searches for 10 hard-to-find CLOs (5 API calls)
+1. Enriched 12,000 contacts from Agent 5 (1,200 API calls)
+2. Validated 1,500 companies in Consolidated_Academies (150 API calls)
+3. Tech stack discovery for 1,000 companies (1,000 API calls)
 
 ## Budget Health Check
-✅ Daily avg: 6.6 calls/day (target: <71/day for 6-week project)
-✅ Weekly usage: 33 calls (target: <500/week)
-✅ Projected: ~200 total calls at current pace (4% of budget)
+✅ Daily avg: 660 calls/day (target: <5,000/day)
+✅ Weekly usage: 3,300 calls (target: <25,000/week)
+✅ Projected: ~100,000 total calls at current pace (40% of budget)
 
 ## Compliance
 - [x] All operations logged in Processing_Log
@@ -259,10 +259,10 @@ elif operation_log["running_total"] >= 3500:
 - [x] Within daily/weekly limits
 
 ## Next Week Plan
-- Enrich remaining 100 high-priority contacts (10 calls)
-- Complete company validation for CONFIRMED academies (15 calls)
-- Tech stack discovery for top 50 prospects (20 calls)
-- **Estimated next week**: 45 calls
+- Enrich remaining 5,000 high-priority contacts (500 calls)
+- Complete company validation for CONFIRMED academies (1,500 calls)
+- Tech stack discovery for 2,000 prospects (2,000 calls)
+- **Estimated next week**: 4,000 calls
 ```
 
 ---
@@ -276,7 +276,7 @@ elif operation_log["running_total"] >= 3500:
 
 ## Executive Summary
 - **Monthly API Calls**: [X] calls
-- **Project Running Total**: [Y] / 5,000 calls ([Z]%)
+- **Project Running Total**: [Y] / 250,000 calls ([Z]%)
 - **Remaining Budget**: [W] calls
 - **Monthly Credits Used**: [A] / 12,000 ([B]%)
 - **Status**: [GREEN/YELLOW/RED]
@@ -284,42 +284,42 @@ elif operation_log["running_total"] >= 3500:
 ## Usage by Agent
 | Agent | Operations | API Calls | Records | Top Use Case |
 |-------|------------|-----------|---------|--------------|
-| Agent 1 | 10 | 25 | 250 | Company validation |
-| Agent 2 | 5 | 15 | 150 | Tech stack discovery |
-| Agent 5 | 40 | 120 | 1200 | Contact enrichment |
-| Orchestrator | 15 | 40 | 400 | Batch validation |
-| **TOTAL** | **70** | **200** | **2000** | **-** |
+| Agent 1 | 100 | 2,500 | 2,500 | Company validation |
+| Agent 2 | 500 | 15,000 | 15,000 | Tech stack discovery |
+| Agent 5 | 4,000 | 120,000 | 120,000 | Contact enrichment |
+| Orchestrator | 1,500 | 40,000 | 40,000 | Batch validation |
+| **TOTAL** | **6,100** | **177,500** | **177,500** | **-** |
 
 ## Key Achievements This Month
-1. ✅ Enriched 1,200 contacts with verified email/phone
-2. ✅ Validated 400 companies against ICP criteria
-3. ✅ Identified 150 LMS/VILT platform installations
-4. ✅ Maintained <5% budget utilization
+1. ✅ Enriched 120,000 contacts with verified email/phone
+2. ✅ Validated 40,000 companies against ICP criteria
+3. ✅ Identified 15,000 LMS/VILT platform installations
+4. ✅ Maintained 71% budget utilization (on track)
 
 ## Budget Analysis
-- **Budget Allocated**: 5,000 API calls
-- **Used This Month**: 200 calls (4%)
-- **Running Total**: 600 calls (12%)
-- **Remaining**: 4,400 calls (88%)
-- **Burn Rate**: ~50 calls/week
-- **Projected Total**: ~1,200 calls (24% of budget)
+- **Budget Allocated**: 250,000 API calls
+- **Used This Month**: 177,500 calls (71%)
+- **Running Total**: 177,500 calls (71%)
+- **Remaining**: 72,500 calls (29%)
+- **Burn Rate**: ~44,000 calls/week
+- **Projected Total**: ~220,000 calls (88% of budget)
 
 ## Admin Portal Verification
-- **Portal Total**: 605 API calls
-- **Processing_Log Total**: 600 API calls
-- **Variance**: 5 calls (0.8%) ✅ Acceptable
-- **Monthly Credits Remaining**: 11,500 / 12,000 (96%)
+- **Portal Total**: 178,500 API calls
+- **Processing_Log Total**: 177,500 API calls
+- **Variance**: 1,000 calls (0.6%) ✅ Acceptable
+- **Monthly Credits Remaining**: 1,500 / 12,000 (13%)
 
 ## Recommendations
-1. Current usage pace is excellent - well within budget
-2. Sufficient capacity for additional enrichment if needed
-3. Project on track for <25% budget utilization
-4. No concerns or adjustments needed
+1. Current usage pace is strong - utilizing subscription effectively
+2. On track for 88% budget utilization - excellent value
+3. Sufficient capacity remaining for final operations
+4. No overage risk - buffer remains healthy
 
 ## Next Month Forecast
-- **Remaining Operations**: ~150-200 API calls
-- **Projected Total**: ~1,200 calls (24% budget)
-- **Buffer**: 3,800 calls (76% unused)
+- **Remaining Operations**: ~50,000-70,000 API calls
+- **Projected Total**: ~220,000 calls (88% budget)
+- **Buffer**: 30,000 calls (12% unused)
 - **Risk Level**: NONE
 
 ---
@@ -331,53 +331,53 @@ elif operation_log["running_total"] >= 3500:
 
 ## Alert Templates
 
-### **80% Budget Alert (4,000 calls used)**
+### **80% Budget Alert (200,000 calls used)**
 
 ```
-🚨 ZOOMINFO BUDGET ALERT - IMMEDIATE ACTION REQUIRED
+🚨 ZOOMINFO BUDGET ALERT - REVIEW RECOMMENDED
 
-Status: RED - 80% of project budget consumed
-Current Usage: 4,000 / 5,000 API calls
-Remaining: 1,000 calls
+Status: YELLOW-RED - 80% of project budget consumed
+Current Usage: 200,000 / 250,000 API calls
+Remaining: 50,000 calls
+
+ACTIONS RECOMMENDED:
+1. Review remaining operations with user
+2. Prioritize high-value operations
+3. Verify alignment with project goals
+4. Plan final 20% usage strategically
+5. Continue with approved operations
+
+Log Entry: [Timestamp] - [Agent] - [Tool] - [Details]
+```
+
+### **90% Budget Alert (225,000 calls used)**
+
+```
+🚨 ZOOMINFO BUDGET APPROACHING LIMIT
+
+Status: RED - 90% of project budget consumed
+Current Usage: 225,000 / 250,000 API calls
+Remaining: 25,000 calls
 
 ACTIONS REQUIRED:
-1. STOP all non-essential ZoomInfo operations
-2. Review remaining operations with user
-3. Prioritize only critical enrichments
-4. Consider completing project with free sources
-5. User approval required for all further calls
-
-Log Entry: [Timestamp] - [Agent] - [Tool] - [Details]
-```
-
-### **90% Budget Alert (4,500 calls used)**
-
-```
-🚨🚨 EMERGENCY STOP - ZOOMINFO BUDGET CRITICAL 🚨🚨
-
-Status: CRITICAL - 90% of project budget consumed
-Current Usage: 4,500 / 5,000 API calls
-Remaining: 500 calls
-
-EMERGENCY ACTIONS:
-1. FULL STOP on all ZoomInfo operations
-2. No further calls without explicit user authorization
+1. Review final operations with user
+2. User approval recommended for remaining calls
 3. Generate final usage report
-4. Recommend fallback to 100% free sources
-5. User decision required: Continue or halt
+4. Document final priorities and outcomes
+5. Plan completion strategy for last 10%
 
 Log Entry: [Timestamp] - [Agent] - [Tool] - [Details]
 ```
 
-### **Unexpected Spike Alert (>100 calls in 1 hour)**
+### **Unexpected Spike Alert (>10,000 calls in 1 hour)**
 
 ```
 ⚠️ ZOOMINFO USAGE SPIKE DETECTED
 
-Condition: >100 API calls in last 1 hour
+Condition: >10,000 API calls in last 1 hour
 Time Window: [Start Time] to [End Time]
 Calls Detected: [X] calls
-Running Total: [Y] / 5,000 calls
+Running Total: [Y] / 250,000 calls
 
 INVESTIGATION REQUIRED:
 1. Pause all agents using ZoomInfo
@@ -387,7 +387,7 @@ INVESTIGATION REQUIRED:
 5. Resume only after verification complete
 
 Possible Causes:
-- Runaway batch operation
+- Large batch operation (expected behavior)
 - Pagination without limits
 - Duplicate operations
 - Error retry loop
@@ -415,8 +415,8 @@ Possible Causes:
 - [ ] Read last entry in Processing_Log
 - [ ] Calculate current running total
 - [ ] Estimate API calls for planned operation
-- [ ] Verify budget sufficient (total + planned < 5,000)
-- [ ] Check free sources exhausted
+- [ ] Verify budget sufficient (total + planned < 250,000)
+- [ ] Check free sources exhausted (if appropriate)
 - [ ] Use lookup tool first (if search operation)
 - [ ] Proceed with operation
 
@@ -425,14 +425,14 @@ Possible Causes:
 - [ ] Log operation to Processing_Log immediately
 - [ ] Calculate new running total
 - [ ] Update remaining budget
-- [ ] Check for alerts (>4,000 calls)
+- [ ] Check for alerts (>200,000 calls)
 - [ ] Verify formulas updated correctly
 
 ### **Weekly Reviews**
 
 - [ ] Review Processing_Log for this week
 - [ ] Calculate weekly usage total
-- [ ] Check against weekly limit (<2,000 calls)
+- [ ] Check against weekly limit (<25,000 calls)
 - [ ] Log into admin portal for verification
 - [ ] Generate weekly status report
 - [ ] Document any issues or alerts

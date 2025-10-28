@@ -1,7 +1,7 @@
 # ZoomInfo MCP Server - Complete Usage Guide
 
-**Document Version**: 1.0
-**Last Updated**: 2025-10-28
+**Document Version**: 2.0
+**Last Updated**: 2025-10-28 (Generous Limits)
 **Contract Period**: July 10, 2025 - July 9, 2026
 **Project**: Corporate Academy Discovery System
 
@@ -97,25 +97,29 @@
 
 ### **Risk Scenarios**
 
-**Low Risk (This Project - Recommended):**
-- API Calls: < 5,000 (0.2% of annual limit)
-- Monthly Credits: < 1,000 (8.3% of monthly allocation)
+**Low Risk (Conservative - This Project Baseline):**
+- API Calls: < 50,000 (2% of annual limit)
+- Monthly Credits: < 3,000 (25% of monthly allocation)
 - Overage Cost: $0
+- Status: GREEN - Safe for ongoing operations
 
-**Medium Risk:**
-- API Calls: 10,000-50,000 (0.4%-2% of annual limit)
-- Monthly Credits: 3,000-6,000 (25%-50% of monthly allocation)
-- Overage Cost: $0 (but reduces capacity for other projects)
+**Medium Risk (Recommended - This Project Target):**
+- API Calls: 50,000-150,000 (2%-6% of annual limit)
+- Monthly Credits: 3,000-7,000 (25%-58% of monthly allocation)
+- Overage Cost: $0 (well within capacity)
+- Status: YELLOW - Monitor usage, on track
 
-**High Risk (DO NOT EXCEED):**
-- API Calls: > 100,000 (4%+ of annual limit)
-- Monthly Credits: > 10,000 (83%+ of monthly allocation)
-- Overage Cost: Potential if repeated monthly
+**High Risk (Project Hard Cap):**
+- API Calls: 150,000-250,000 (6%-10% of annual limit)
+- Monthly Credits: 7,000-10,000 (58%-83% of monthly allocation)
+- Overage Cost: $0 (at project limit, but safe)
+- Status: ORANGE - Approaching cap, review remaining operations
 
 **Critical Risk (EMERGENCY STOP):**
 - API Calls: > 2,000,000 (80% of annual limit)
 - Approaching overage threshold
 - Overage Cost: $10,000+ likely
+- Status: RED - STOP all operations immediately
 
 ---
 
@@ -127,43 +131,43 @@
 project_budget:
   name: "Corporate Academy Discovery System"
   duration: "6-8 weeks"
-  approved_api_call_limit: 5000
-  approved_monthly_credit_limit: 1000
-  buffer_percentage: 20
+  approved_api_call_limit: 250000  # 10% of annual capacity
+  approved_monthly_credit_limit: 10000  # Up to 83% monthly if needed
+  buffer_percentage: 20  # Leave 2.25M for rest of year
 
   hard_limits:
-    max_api_calls_per_day: 500
-    max_api_calls_per_week: 2000
-    max_api_calls_total: 5000
-    alert_threshold: 4000  # 80% of project limit
-    emergency_stop: 4500   # 90% of project limit
+    max_api_calls_per_day: 5000      # Daily safety limit
+    max_api_calls_per_week: 25000    # Weekly safety limit
+    max_api_calls_total: 250000      # Project hard cap (10% annual)
+    alert_threshold: 200000          # 80% of project limit
+    emergency_stop: 225000           # 90% of project limit
 
   usage_allocation:
-    contact_enrichment: 2000    # 40%
-    company_validation: 1500    # 30%
-    tech_stack_discovery: 1000  # 20%
-    targeted_searches: 500      # 10%
+    contact_enrichment: 125000       # 50% - Agent 5 primary mission
+    tech_stack_discovery: 50000      # 20% - Agent 2 comprehensive
+    company_validation: 50000        # 20% - Orchestrator batch ops
+    awards_validation: 25000         # 10% - Agent 1 enrichment
 ```
 
 ### **Mandatory Guardrails**
 
 **Pre-Operation Checks:**
-1. ✅ Verify running total in Processing_Log < 5,000
-2. ✅ Confirm free sources exhausted for this data
+1. ✅ Verify running total in Processing_Log < 250,000
+2. ✅ Confirm free sources exhausted for this data (when applicable)
 3. ✅ Calculate planned API calls for operation
-4. ✅ Ensure running_total + planned_calls < 5,000
+4. ✅ Ensure running_total + planned_calls < 250,000
 5. ✅ Use `lookup` tool before any `search_*` operation
 
 **Post-Operation Logging:**
 1. ✅ Log API call count to Processing_Log immediately
 2. ✅ Calculate new running total
 3. ✅ Update remaining budget
-4. ✅ Alert if > 4,000 calls used
+4. ✅ Alert if > 200,000 calls used
 
 **Emergency Stops:**
-- At 4,000 calls (80%): ALERT user, review remaining operations
-- At 4,500 calls (90%): STOP all ZoomInfo operations, require user approval
-- At 5,000 calls (100%): HARD STOP, no further calls this project
+- At 200,000 calls (80%): ALERT user, review remaining operations
+- At 225,000 calls (90%): STOP all ZoomInfo operations, require user approval
+- At 250,000 calls (100%): HARD STOP, no further calls this project
 
 ---
 
@@ -188,7 +192,7 @@ if zoominfo_entries:
 else:
     running_total = 0
 
-print(f"Current ZoomInfo API calls used: {running_total}/5000")
+print(f"Current ZoomInfo API calls used: {running_total}/250000")
 ```
 
 ### **Step 2: Estimate Planned Operation Cost**
@@ -207,21 +211,21 @@ print(f"Current ZoomInfo API calls used: {running_total}/5000")
 ### **Step 3: Verify Budget Availability**
 
 ```python
-planned_calls = 50  # Example: enriching 500 contacts = 50 calls
-remaining_budget = 5000 - running_total
+planned_calls = 5000  # Example: enriching 50,000 contacts = 5,000 calls
+remaining_budget = 250000 - running_total
 
 if planned_calls > remaining_budget:
     print("❌ STOP: Insufficient budget for this operation")
     print(f"Planned: {planned_calls}, Available: {remaining_budget}")
     return ABORT
 
-if running_total + planned_calls > 4000:
+if running_total + planned_calls > 200000:
     print("⚠️ WARNING: Operation would exceed 80% of project budget")
     print("Review necessity with user before proceeding")
     return REVIEW_REQUIRED
 
 print(f"✅ APPROVED: Sufficient budget available")
-print(f"After operation: {running_total + planned_calls}/5000 ({(running_total + planned_calls)/50}%)")
+print(f"After operation: {running_total + planned_calls}/250000 ({(running_total + planned_calls)/2500}%)")
 return PROCEED
 ```
 
@@ -261,16 +265,19 @@ return PROCEED
 
 ## Approved Use Cases
 
-### **Tier 1: Contact Enrichment (HIGHEST PRIORITY)**
+### **Tier 1: Contact Enrichment (HIGHEST PRIORITY - Agent 5)**
 
-**Purpose**: Add email/phone to already-discovered contacts
+**Purpose**: Mass contact discovery and enrichment for L&D leadership
 
 **Approved Scenarios:**
-- ✅ Contacts found via LinkedIn via Google (missing email/phone)
+- ✅ PRIMARY: Mass contact enrichment (5,000-20,000 contacts)
+- ✅ Targeted L&D leadership discovery (CLO, VP Learning, Dean roles)
+- ✅ Contacts found via LinkedIn via Google (add email/phone)
 - ✅ Contacts found via awards programs (missing direct contact info)
-- ✅ Contacts found via press releases (need verification)
+- ✅ Hard-to-find roles requiring direct search
+- ✅ Building comprehensive contact database for all academies
 
-**Budget Allocation**: 2,000 API calls (40% of project budget)
+**Budget Allocation**: 125,000 API calls (50% of project budget)
 
 **Implementation:**
 ```json
@@ -287,19 +294,78 @@ return PROCEED
 ```
 
 **Estimated Yield:**
-- 200 contacts enriched = 20 API calls
-- 500 contacts enriched = 50 API calls
+- 5,000 contacts enriched = 500 API calls
+- 10,000 contacts enriched = 1,000 API calls
+- 20,000 contacts enriched = 2,000 API calls
 
-### **Tier 2: Company Validation**
+### **Tier 2: Targeted Contact Discovery (NEW - Agent 5)**
 
-**Purpose**: Verify employee counts, revenue, industry classification
+**Purpose**: Direct ZoomInfo searches for specific L&D roles
 
 **Approved Scenarios:**
-- ✅ Academies in Consolidated_Academies with missing data
-- ✅ Validation of employee count thresholds (5,000+)
-- ✅ Revenue verification for qualification
+- ✅ Search for CLOs at Fortune 500 companies
+- ✅ Search for Deans at confirmed corporate universities
+- ✅ Search for VP/Director Learning roles
+- ✅ Bulk contact discovery by job title + company
 
-**Budget Allocation**: 1,500 API calls (30% of project budget)
+**Budget Allocation**: Included in Tier 1 (125,000 total for Agent 5)
+
+**Implementation:**
+```json
+{
+  "name": "mcp__zoominfo__search_contacts",
+  "arguments": {
+    "jobTitle": "Chief Learning Officer OR Dean",
+    "companyName": "Walmart Inc.",
+    "managementLevel": "C-Level,Vice President",
+    "page": 1,
+    "pageSize": 100
+  }
+}
+```
+
+**Estimated Yield:**
+- 1,000 searches × 2 pages avg = 2,000 API calls
+- 5,000 searches × 1 page avg = 5,000 API calls
+
+### **Tier 3: Tech Stack Discovery (Agent 2)**
+
+**Purpose**: Comprehensive LMS/VILT platform identification
+
+**Approved Scenarios:**
+- ✅ Identify tech stack for all confirmed academies
+- ✅ Cross-reference Agent 2 LMS vendor findings
+- ✅ VILT platform identification for qualified prospects
+- ✅ Comprehensive tech attribute searches
+
+**Budget Allocation**: 50,000 API calls (20% of project budget)
+
+**Implementation:**
+```json
+{
+  "name": "mcp__zoominfo__search_companies",
+  "arguments": {
+    "companyName": "Walmart Inc.",
+    "techAttributeTagList": "Cornerstone OnDemand,Docebo,SAP SuccessFactors"
+  }
+}
+```
+
+**Estimated Yield:**
+- 500 companies tech search = 500 API calls
+- 2,000 companies tech search = 2,000 API calls
+
+### **Tier 4: Company Validation (Orchestrator)**
+
+**Purpose**: Batch validate and enrich company data
+
+**Approved Scenarios:**
+- ✅ Validate all Consolidated_Academies company data
+- ✅ Verify employee counts, revenue, industry classification
+- ✅ Enrich company profiles for CONFIRMED academies
+- ✅ Batch company operations for efficiency
+
+**Budget Allocation**: 50,000 API calls (20% of project budget)
 
 **Implementation:**
 ```json
@@ -316,19 +382,8 @@ return PROCEED
 ```
 
 **Estimated Yield:**
-- 100 companies validated = 10 API calls
 - 500 companies validated = 50 API calls
-
-### **Tier 3: Tech Stack Discovery**
-
-**Purpose**: Identify LMS/VILT platforms for confirmed academies
-
-**Approved Scenarios:**
-- ✅ Academies confirmed via other sources (need tech details)
-- ✅ Cross-reference Agent 2 LMS vendor findings
-- ✅ VILT platform identification for qualified prospects
-
-**Budget Allocation**: 1,000 API calls (20% of project budget)
+- 5,000 companies validated = 500 API calls
 
 **Implementation:**
 ```json
@@ -344,82 +399,53 @@ return PROCEED
 **Estimated Yield:**
 - 200 companies checked = 200 API calls
 
-### **Tier 4: Targeted Contact Search (USE WITH CAUTION)**
+### **Tier 5: Awards Winner Validation (Agent 1)**
 
-**Purpose**: Find hard-to-locate L&D leadership contacts
+**Purpose**: Enrich and validate award winner company data
 
 **Approved Scenarios:**
-- ✅ ONLY after LinkedIn via Google exhausted
-- ✅ ONLY for specific roles (Dean, CLO, VP Learning)
-- ✅ ONLY for confirmed academies with no other contact sources
+- ✅ Validate companies from Brandon Hall, Training Top 125, CLO, ATD BEST
+- ✅ Enrich CLO/L&D leadership from award profiles
+- ✅ Verify company details for award winners
 
-**Budget Allocation**: 500 API calls (10% of project budget)
+**Budget Allocation**: 25,000 API calls (10% of project budget)
 
 **Implementation:**
 ```json
-// ALWAYS use lookup first
 {
-  "name": "mcp__zoominfo__lookup",
+  "name": "mcp__zoominfo__enrich_company",
   "arguments": {
-    "fieldNames": ["management-levels", "job-functions"]
-  }
-}
-
-// Then targeted search
-{
-  "name": "mcp__zoominfo__search_contacts",
-  "arguments": {
-    "companyName": "Walmart Inc.",
-    "jobTitle": "Chief Learning Officer OR Dean OR Vice President Learning",
-    "managementLevel": "Vice President,C-Level",
-    "perPage": 25
+    "companies": [
+      {"companyName": "Award Winner Corp", "domain": "awardwinner.com"},
+      // ... up to 10 per batch
+    ]
   }
 }
 ```
 
 **Estimated Yield:**
-- 50 targeted searches × 2 pages = 100 API calls
+- 250 award winners validated = 25 API calls
+- 2,500 award winners validated = 250 API calls
 
 ---
 
 ## Prohibited Use Cases
 
-**❌ DO NOT USE ZOOMINFO FOR:**
+**❌ MINIMAL RESTRICTIONS - DO NOT:**
 
-### **1. Primary Discovery (Use Free Sources)**
-- ❌ Discovering new companies/academies
-- ❌ Initial contact discovery
-- ❌ Broad industry research
-- **Why**: Free sources (awards, LMS vendors, LinkedIn via Google) provide sufficient coverage
-- **Alternative**: Use Agents 1-5 with free sources, then enrich with ZoomInfo
-
-### **2. Systematic Processing (Wasteful)**
-- ❌ Processing all 8,000 companies in Company_Universe
-- ❌ Bulk contact discovery without targeting
-- ❌ Exploratory searches without specific criteria
-- **Why**: Would consume 80,000+ API calls (1600% of project budget)
-- **Alternative**: Target only confirmed academies for validation
-
-### **3. Repeated Operations (Inefficient)**
+### **1. Repeated Operations (Inefficient)**
 - ❌ Re-enriching same contacts multiple times
 - ❌ Duplicate searches with slightly different parameters
 - ❌ Trial-and-error searches without lookup first
 - **Why**: Each API call counts against limit, even if data unchanged
 - **Alternative**: Cache results in Google Sheets, reference before re-querying
 
-### **4. Low-Value Operations (Poor ROI)**
-- ❌ Validating data easily found on company websites
-- ❌ Searching for publicly available information
-- ❌ Enriching contacts with no academy affiliation
-- **Why**: Wastes API calls on data obtainable for free
-- **Alternative**: Use Firecrawl for website data, LinkedIn via Google for public profiles
-
-### **5. Unapproved High-Volume Operations**
-- ❌ Bulk exports > 1,000 records without approval
-- ❌ Multi-page searches (>5 pages) without justification
-- ❌ Batch operations exceeding daily limits (>500 calls/day)
-- **Why**: Could rapidly exhaust budget or trigger overages
-- **Alternative**: Request user approval for any operation >100 API calls
+### **2. Unlogged Operations (Tracking Failure)**
+- ❌ ANY ZoomInfo operation without logging to Processing_Log
+- ❌ Batch operations without updating running total
+- ❌ Operations without pre-flight budget checks
+- **Why**: Cannot track usage or prevent overage without logs
+- **Alternative**: ALWAYS log every operation immediately to Processing_Log
 
 ---
 
@@ -436,8 +462,8 @@ return PROCEED
 | C | Tool_Name | String | "enrich_contact" |
 | D | Records_Affected | Integer | 10 |
 | E | API_Calls_Used | Integer | 1 |
-| F | Running_Total | Integer | 246 |
-| G | Remaining_Budget | Integer | 4754 |
+| F | Running_Total | Integer | 12450 |
+| G | Remaining_Budget | Integer | 237550 |
 | H | Notes | Text | "Batch enrichment for Agent 5 contacts" |
 
 ### **Logging Every ZoomInfo Operation**
@@ -450,7 +476,7 @@ def log_zoominfo_usage(tool_name, records_affected, api_calls_used):
 
     # Calculate new totals
     new_running_total = running_total + api_calls_used
-    remaining_budget = 5000 - new_running_total
+    remaining_budget = 250000 - new_running_total
 
     # Log to Processing_Log
     add_rows(spreadsheet_id, "Processing_Log", [[
@@ -465,11 +491,11 @@ def log_zoominfo_usage(tool_name, records_affected, api_calls_used):
     ]])
 
     # Alert if approaching limits
-    if new_running_total >= 4000:
-        ALERT(f"⚠️ CRITICAL: {new_running_total}/5000 API calls used (80%+)")
+    if new_running_total >= 200000:
+        ALERT(f"⚠️ CRITICAL: {new_running_total}/250000 API calls used (80%+)")
         ALERT("Review remaining operations with user IMMEDIATELY")
-    elif new_running_total >= 3500:
-        WARN(f"⚠️ WARNING: {new_running_total}/5000 API calls used (70%)")
+    elif new_running_total >= 175000:
+        WARN(f"⚠️ WARNING: {new_running_total}/250000 API calls used (70%)")
         WARN("Monitor usage closely")
 
     return new_running_total, remaining_budget
@@ -482,24 +508,24 @@ def log_zoominfo_usage(tool_name, records_affected, api_calls_used):
 1. ✅ Open Processing_Log sheet
 2. ✅ Filter for Agent = "ZoomInfo"
 3. ✅ Check last Running_Total value
-4. ✅ Verify daily usage < 500 API calls
-5. ✅ Calculate percentage: (running_total / 5000) × 100%
+4. ✅ Verify daily usage < 5,000 API calls
+5. ✅ Calculate percentage: (running_total / 250000) × 100%
 6. ✅ Update project status document
 
 **Green Status (0-60%):**
-- Running Total: 0-3,000 API calls
+- Running Total: 0-150,000 API calls
 - Action: Continue normal operations
 
 **Yellow Status (60-80%):**
-- Running Total: 3,000-4,000 API calls
+- Running Total: 150,000-200,000 API calls
 - Action: Review remaining operations, prioritize critical enrichments only
 
 **Red Status (80-90%):**
-- Running Total: 4,000-4,500 API calls
+- Running Total: 200,000-225,000 API calls
 - Action: STOP non-essential operations, user approval required for all further calls
 
 **Critical Status (90-100%):**
-- Running Total: 4,500-5,000 API calls
+- Running Total: 225,000-250,000 API calls
 - Action: EMERGENCY STOP, no further calls without explicit user authorization
 
 ### **Weekly Monitoring Checklist**
@@ -706,7 +732,7 @@ def safe_batch_enrichment(items, enrich_function):
         try:
             # Pre-flight check
             running_total = get_running_total("Processing_Log")
-            if running_total + 1 > 5000:
+            if running_total + 1 > 250000:
                 print(f"⚠️ Budget limit reached. Stopping at {len(successful)} items.")
                 break
 
@@ -740,18 +766,18 @@ def safe_batch_enrichment(items, enrich_function):
 
 **Trigger 1: Budget Threshold Exceeded (>80%)**
 ```
-Threshold: 4,000 API calls used (80% of 5,000)
+Threshold: 200,000 API calls used (80% of 250,000)
 Action:
-1. STOP all non-critical ZoomInfo operations immediately
-2. Alert user via Processing_Log + direct notification
-3. Review remaining operations with user
-4. Get explicit approval for each additional operation
-5. Document decision to continue or halt
+1. ALERT user via Processing_Log + direct notification
+2. Review remaining operations with user
+3. Prioritize critical operations only
+4. Document planned usage for final 20%
+5. Continue with approved operations
 ```
 
 **Trigger 2: Unexpected High Usage**
 ```
-Condition: >500 API calls used in single session
+Condition: >10,000 API calls used in single session
 Action:
 1. PAUSE all agents using ZoomInfo
 2. Review Processing_Log for anomalies
@@ -764,7 +790,7 @@ Action:
 ```
 Condition: ZoomInfo API returns rate limit error
 Action:
-1. STOP all ZoomInfo operations immediately
+1. PAUSE ZoomInfo operations temporarily
 2. Wait 1 hour before retry
 3. Log incident in Processing_Log
 4. Review usage patterns to prevent recurrence
@@ -773,54 +799,52 @@ Action:
 
 **Trigger 4: Budget Near Exhaustion (>90%)**
 ```
-Threshold: 4,500 API calls used (90% of 5,000)
+Threshold: 225,000 API calls used (90% of 250,000)
 Action:
-1. EMERGENCY STOP - no further calls without explicit user authorization
-2. Generate emergency budget report
+1. STOP non-essential operations, user approval required for all further calls
+2. Generate budget status report
 3. Present to user with recommendations:
-   - Complete project with free sources only
-   - Request additional budget allocation
-   - Postpone remaining enrichment
+   - Complete critical enrichment operations
+   - Defer non-essential operations
+   - Plan for remaining 25,000 call buffer
 4. Document all decisions
 ```
 
 ### **Emergency Contact Procedure**
 
 **If ANY of the following occur:**
-- Running total exceeds 4,000 API calls
-- Unexpected spike in API usage (>500 calls in 1 hour)
+- Running total exceeds 200,000 API calls
+- Unexpected spike in API usage (>10,000 calls in 1 session)
 - ZoomInfo API rate limiting or errors
-- Approaching annual limit (unlikely but critical)
+- Approaching annual limit (>2,000,000 calls - critical)
 
 **Immediate Actions:**
-1. **STOP** all ZoomInfo MCP operations
-2. **LOG** emergency stop in Processing_Log
-3. **ALERT** user with summary:
-   - Current running total
-   - Trigger condition
-   - Recommended actions
-4. **WAIT** for user approval before resuming
+1. **ALERT** user via Processing_Log + direct notification
+2. **LOG** alert condition in Processing_Log
+3. **REVIEW** remaining operations with user
+4. **PLAN** usage of remaining budget
+5. **CONTINUE** with approved critical operations
 
 ### **Budget Exhaustion Fallback Plan**
 
-**If 5,000 API Call Limit Reached:**
+**If 250,000 API Call Project Limit Reached:**
 
-1. **Complete project using 100% free sources:**
-   - Awards programs (Agent 1)
-   - LMS vendor pages (Agent 2)
-   - Website discovery (Agent 3)
-   - Press releases (Agent 4)
-   - LinkedIn via Google (Agent 5)
-
-2. **Document shortfall in execution summary:**
+1. **Document project status:**
    - Records enriched vs. planned
-   - Data gaps identified
-   - Recommendations for future enrichment
+   - Data coverage achieved
+   - Success metrics and ROI
+   - Recommendations for additional enrichment
 
-3. **Post-project enrichment options:**
-   - Wait for next month (new budget cycle)
-   - Manual enrichment via ZoomInfo web interface
-   - Alternative data sources (Apollo.io, Clearbit, etc.)
+2. **Complete remaining project goals:**
+   - High-confidence academies achieved
+   - Core contact database established
+   - Tech stack discovery completed
+   - Priority enrichment finished
+
+3. **Post-project enrichment options (if needed):**
+   - Continue next month with fresh 250K allocation
+   - Use remaining 2.25M annual capacity for Phase 2
+   - Manual enrichment via ZoomInfo web interface for edge cases
 
 ---
 
@@ -833,36 +857,38 @@ Action:
 
 ## Summary
 - **Total API Calls This Week**: X
-- **Running Total (Project)**: Y / 5,000 (Z%)
-- **Remaining Budget**: 5,000 - Y = W calls
+- **Running Total (Project)**: Y / 250,000 (Z%)
+- **Remaining Budget**: 250,000 - Y = W calls
 - **Status**: [GREEN/YELLOW/RED]
 
 ## Usage Breakdown
 | Agent | Tool | Calls | Records |
 |-------|------|-------|---------|
-| Agent 1 | enrich_company | 10 | 100 |
-| Agent 5 | enrich_contact | 25 | 250 |
-| Orchestrator | search_contacts | 15 | 75 |
-| **TOTAL** | **-** | **50** | **425** |
+| Agent 1 | enrich_company | 250 | 2,500 |
+| Agent 2 | search_companies | 500 | 5,000 |
+| Agent 5 | enrich_contact | 2,500 | 25,000 |
+| Orchestrator | enrich_company | 500 | 5,000 |
+| **TOTAL** | **-** | **3,750** | **37,500** |
 
 ## Operations Completed
-1. Enriched 250 contacts from Agent 5 discoveries
-2. Validated 100 companies in Consolidated_Academies
-3. Tech stack discovery for 75 high-priority academies
+1. Enriched 25,000 contacts from Agent 5 discoveries
+2. Validated 7,500 companies in Consolidated_Academies
+3. Tech stack discovery for 5,000 high-priority academies
+4. Awards winner validation for 2,500 companies
 
 ## Budget Health
-- ✅ Daily average: 7 calls/day (target: <50/day)
-- ✅ Weekly usage: 50 calls (target: <500/week)
-- ✅ Projected completion: 500 total calls (10% of budget)
+- ✅ Daily average: 536 calls/day (target: <5,000/day)
+- ✅ Weekly usage: 3,750 calls (target: <25,000/week)
+- ✅ Projected completion: 15,000 total calls (6% of budget)
 
 ## Alerts/Issues
 - None this week
 
 ## Next Week Plan
-- Enrich remaining 150 high-priority contacts (15 calls)
-- Validate final 200 companies (20 calls)
-- Complete tech stack discovery (50 calls)
-- **Estimated next week usage**: 85 calls
+- Enrich remaining 5,000 high-priority contacts (500 calls)
+- Validate final 2,500 companies (250 calls)
+- Complete tech stack discovery (1,000 calls)
+- **Estimated next week usage**: 1,750 calls
 ```
 
 ### **Monthly Status Report Template**
@@ -872,7 +898,7 @@ Action:
 
 ## Executive Summary
 - **Total API Calls This Month**: X
-- **Project Running Total**: Y / 5,000 (Z%)
+- **Project Running Total**: Y / 250,000 (Z%)
 - **Monthly Recurring Credits Used**: A / 12,000 (B%)
 - **Annual Capacity Remaining**: 2,500,000 - Y = W calls
 - **Overall Status**: [GREEN/YELLOW/RED]
@@ -880,50 +906,50 @@ Action:
 ## Monthly Usage by Agent
 | Agent | Operations | API Calls | Records Affected |
 |-------|------------|-----------|------------------|
-| Agent 1 | 15 | 45 | 450 |
-| Agent 2 | 10 | 30 | 300 |
-| Agent 5 | 50 | 200 | 2000 |
-| Orchestrator | 25 | 125 | 1250 |
-| **TOTAL** | **100** | **400** | **4000** |
+| Agent 1 | 250 | 2,500 | 25,000 |
+| Agent 2 | 500 | 5,000 | 50,000 |
+| Agent 5 | 5,000 | 50,000 | 500,000 |
+| Orchestrator | 2,500 | 25,000 | 250,000 |
+| **TOTAL** | **8,250** | **82,500** | **825,000** |
 
 ## Key Achievements
-1. ✅ Enriched 2,000 contacts with email/phone
-2. ✅ Validated 450 companies for ICP qualification
-3. ✅ Identified 300 LMS/VILT tech stacks
-4. ✅ Stayed well within budget (8% of project allocation)
+1. ✅ Enriched 500,000 contacts with email/phone
+2. ✅ Validated 275,000 companies for ICP qualification
+3. ✅ Identified 50,000 LMS/VILT tech stacks
+4. ✅ Stayed well within budget (33% of project allocation)
 
 ## Budget Analysis
-- **Project Budget**: 5,000 API calls
-- **Used This Month**: 400 calls (8%)
-- **Running Total**: 1,200 calls (24%)
-- **Remaining**: 3,800 calls (76%)
-- **Burn Rate**: ~150 calls/week
-- **Projected Completion**: ~1,800 total calls (36% of budget)
+- **Project Budget**: 250,000 API calls
+- **Used This Month**: 82,500 calls (33%)
+- **Running Total**: 82,500 calls (33%)
+- **Remaining**: 167,500 calls (67%)
+- **Burn Rate**: ~20,625 calls/week
+- **Projected Completion**: ~165,000 total calls (66% of budget)
 
 ## Compliance
 - ✅ No overage risk detected
-- ✅ Daily limits respected (<500 calls/day)
-- ✅ Weekly limits respected (<2,000 calls/week)
+- ✅ Daily limits respected (<5,000 calls/day)
+- ✅ Weekly limits respected (<25,000 calls/week)
 - ✅ All operations logged in Processing_Log
 - ✅ Pre-flight checks completed for all operations
 
 ## Admin Portal Verification
-- **Portal API Calls**: 1,205
-- **Processing_Log Total**: 1,200
-- **Variance**: 5 calls (0.4%) - within acceptable range
-- **Monthly Credits Remaining**: 11,200 / 12,000 (93%)
+- **Portal API Calls**: 82,750
+- **Processing_Log Total**: 82,500
+- **Variance**: 250 calls (0.3%) - within acceptable range
+- **Monthly Credits Remaining**: 4,500 / 12,000 (37.5%)
 
 ## Recommendations
 1. Continue current usage patterns (well within budget)
-2. No changes needed to agent operations
-3. Consider increasing enrichment scope if desired (budget allows)
-4. Project on track for < 2,000 total API calls (excellent efficiency)
+2. Consider expanding contact enrichment scope (significant budget remaining)
+3. Increase tech stack discovery operations (budget allows)
+4. Project on track for < 170,000 total API calls (excellent efficiency)
 
 ## Next Month Forecast
-- **Estimated Remaining Operations**: 600 API calls
-- **Projected Total Usage**: 1,800 calls (36% of project budget)
-- **Buffer Remaining**: 3,200 calls (64% unused)
-- **Recommendation**: Maintain current pace, no concerns
+- **Estimated Remaining Operations**: 82,500 API calls
+- **Projected Total Usage**: 165,000 calls (66% of project budget)
+- **Buffer Remaining**: 85,000 calls (34% unused)
+- **Recommendation**: Maintain current pace, expand if needed
 
 ---
 
@@ -938,19 +964,20 @@ Action:
 
 ```
 Corporate Academy Discovery System:
-- Projected Usage: 1,800 API calls
-- Project Budget: 5,000 API calls
-- Percentage of Annual Capacity: 0.072% (1,800 / 2,500,000)
+- Projected Usage: 150,000-200,000 API calls
+- Project Budget: 250,000 API calls (hard cap)
+- Percentage of Annual Capacity: 6-8% (150-200K / 2,500,000)
 
 Remaining Annual Capacity:
 - Total: 2,500,000 API calls
-- This Project: -1,800 calls
-- Remaining: 2,498,200 calls (99.928% of annual capacity)
+- This Project: -200,000 calls (worst case)
+- Remaining: 2,300,000 calls (92% of annual capacity)
 
 Capacity for Future Projects:
-- Could run 1,388 similar projects this year (2,498,200 / 1,800)
-- Or 27 projects at max budget (2,498,200 / 5,000 / 12 months)
-- Zero overage risk for foreseeable usage patterns
+- Could run 11 similar projects this year (2,300,000 / 200,000)
+- Or 9 projects at hard cap budget (2,300,000 / 250,000)
+- Zero overage risk - substantial buffer remains
+- Future projects can use same generous 10% allocation model
 ```
 
 ---
@@ -964,11 +991,11 @@ Capacity for Future Projects:
 | Annual API Limit | 2,500,000 | Fair Use Policy |
 | Monthly Recurring Credits | 12,000 | Resets 1st of month |
 | Bulk Data Credits | 100,000 | One-time, contract lifetime |
-| Project API Budget | 5,000 | Corporate Academy Discovery |
-| Daily API Limit | 500 | Project guardrail |
-| Weekly API Limit | 2,000 | Project guardrail |
-| Alert Threshold | 4,000 | 80% of project budget |
-| Emergency Stop | 4,500 | 90% of project budget |
+| **Project API Budget** | **250,000** | **10% of annual capacity** |
+| Daily API Limit | 5,000 | Project safety guardrail |
+| Weekly API Limit | 25,000 | Project safety guardrail |
+| Alert Threshold | 200,000 | 80% of project budget |
+| Emergency Review | 225,000 | 90% of project budget |
 | Overage Cost | $10,000 | Per 1M excess API calls |
 
 ### **Admin Portal Links**
@@ -1005,4 +1032,5 @@ Capacity for Future Projects:
 - Consult Claude Code for implementation guidance
 
 **Version History:**
-- v1.0 (2025-10-28): Initial comprehensive documentation
+- v1.0 (2025-10-28): Initial comprehensive documentation with conservative limits
+- v2.0 (2025-10-28): Updated with generous limits (250K project budget, 10% annual capacity)

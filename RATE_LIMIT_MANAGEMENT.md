@@ -1,14 +1,16 @@
 # Rate Limit Management Guide - Corporate Academy Discovery System
 
-**Version:** 1.0
+**Version:** 2.0
 **Date:** 2025-10-28
-**Scope:** 100% Free Data Sources
+**Scope:** Hybrid Methodology (Free Sources + Strategic ZoomInfo Enrichment)
 
 ---
 
 ## Overview
 
-This guide provides comprehensive rate limit management strategies for the Corporate Academy Discovery System using only free data sources. All sources have been validated for their rate limiting behavior and best practices documented.
+This guide provides comprehensive rate limit management strategies for the Corporate Academy Discovery System using a **hybrid methodology**: free data sources for primary discovery (80-90%) and strategic ZoomInfo enrichment for data enhancement (10-20%). All sources have been validated for their rate limiting behavior and best practices documented.
+
+**Critical Addition:** This version includes comprehensive ZoomInfo budget management, tracking requirements, and safety guardrails to ensure responsible usage within contract limits.
 
 ---
 
@@ -307,6 +309,441 @@ Tested with 50 searches:
 
 ---
 
+## ZoomInfo Rate Limits & Budget Management (CRITICAL)
+
+### Subscription Overview
+
+**Contract Period:** July 10, 2025 - July 9, 2026
+
+**Available Resources:**
+- **12,000 Monthly Recurring Credits** (resets monthly, no rollover)
+- **100,000 Bulk Data Credits** (one-time, contract lifetime)
+- **2,500,000 API Calls** annual limit (250K records × 10 fair use multiplier)
+
+**Overage Cost:** **$10,000 per 1 million excess API calls** ⚠️
+
+### Project Budget (STRICT LIMITS)
+
+**Total Allocated:** **5,000 API calls** (0.2% of annual capacity)
+
+**Budget Allocation by Tier:**
+
+| Tier | Purpose | API Calls | Percentage |
+|------|---------|-----------|------------|
+| Tier 1 | Contact Enrichment | 2,000 | 40% |
+| Tier 2 | Company Validation | 1,500 | 30% |
+| Tier 3 | Tech Stack Discovery | 1,000 | 20% |
+| Tier 4 | Targeted Search | 500 | 10% |
+| **TOTAL** | **Project Budget** | **5,000** | **100%** |
+
+**Conservative Estimate:** 120-450 API calls actual usage (2-9% of budget)
+
+### Alert Thresholds & Status Levels
+
+**🟢 GREEN ZONE (0-60% / 0-3,000 calls)**
+- Normal operations
+- No restrictions
+- Continue as planned
+
+**🟡 YELLOW ZONE (60-80% / 3,000-4,000 calls)**
+- Monitor closely
+- Review usage patterns
+- Verify free alternatives exhausted
+- Daily tracking required
+
+**🔴 RED ZONE (80-90% / 4,000-4,500 calls)**
+- **ALERT USER immediately**
+- Require explicit approval for each operation
+- Justify every ZoomInfo call
+- Consider switching to free-only mode
+
+**🚨 CRITICAL ZONE (90-100% / 4,500-5,000 calls)**
+- **EMERGENCY STOP** all ZoomInfo operations
+- Switch to 100% free sources
+- User approval required to resume
+- Document reason for budget consumption
+
+### Mandatory Pre-Flight Checklist
+
+**BEFORE EVERY ZoomInfo operation, verify:**
+
+```python
+def zoominfo_preflight_check(operation_name, estimated_calls):
+    """Mandatory safety check before ZoomInfo usage"""
+
+    # 1. Check current budget status
+    current_usage = get_total_api_calls_from_log()
+    remaining = 5000 - current_usage
+
+    if current_usage >= 4500:
+        raise EmergencyStop("🚨 CRITICAL: 90% budget consumed")
+
+    # 2. Calculate operation cost
+    planned_total = current_usage + estimated_calls
+
+    if planned_total > 5000:
+        raise BudgetExceeded(f"Operation would exceed budget: {planned_total}/5000")
+
+    # 3. Verify free alternatives exhausted
+    if not free_sources_exhausted():
+        raise PrematureUsage("❌ Free sources not exhausted - use free first")
+
+    # 4. Check if lookup is possible (mandatory first)
+    if operation_name in ["enrich_contact", "enrich_company"]:
+        if not lookup_attempted_first():
+            raise LookupRequired("❌ Must attempt lookup before enrichment")
+
+    # 5. Log pre-flight approval
+    log_to_sheets("Processing_Log", [
+        timestamp(),
+        "ZI_PREFLIGHT",
+        f"{operation_name}: {estimated_calls} calls planned, {remaining} remaining",
+        "APPROVED"
+    ])
+
+    return True  # Proceed with operation
+```
+
+**Execute this check EVERY time before calling ZoomInfo MCP tools.**
+
+### ZoomInfo MCP Tool Usage Patterns
+
+**Available Tools:**
+
+1. **mcp__zoominfo__lookup** (FREE - always try first)
+   - Check if record exists in ZoomInfo
+   - Returns basic match confirmation
+   - **Cost:** 0 API calls if no match, 1 if match found
+   - **Mandatory first step** before enrichment
+
+2. **mcp__zoominfo__enrich_contact** (PAID)
+   - Adds email, phone, title details
+   - **Cost:** 1 API call per contact
+   - **Batch mode:** 10 contacts = 1 API call (10x efficiency)
+
+3. **mcp__zoominfo__enrich_company** (PAID)
+   - Adds employee count, revenue, tech stack
+   - **Cost:** 1 API call per company
+   - **Batch mode:** 10 companies = 1 API call
+
+4. **mcp__zoominfo__search_contacts** (PAID)
+   - Find contacts by criteria
+   - **Cost:** 1 API call per search query
+   - Returns up to 100 results per search
+
+5. **mcp__zoominfo__search_companies** (PAID)
+   - Find companies by criteria
+   - **Cost:** 1 API call per search query
+   - Returns up to 100 results per search
+
+### Batch Processing (CRITICAL EFFICIENCY)
+
+**ALWAYS use batch mode when enriching multiple records:**
+
+```python
+# ❌ WRONG: Individual enrichment (100 contacts = 100 API calls)
+for contact in contacts:
+    enrich_contact(contact)  # 1 API call each = 100 total
+
+# ✅ RIGHT: Batch enrichment (100 contacts = 10 API calls)
+for batch in chunks(contacts, 10):
+    enrich_contact_batch(batch)  # 10 contacts = 1 API call × 10 batches = 10 total
+
+# Savings: 90 API calls (90% reduction)
+```
+
+**Batch Size Limits:**
+- Contact enrichment: 10 records per call (MCP limit)
+- Company enrichment: 10 records per call (MCP limit)
+- Searches: 100 results per query (single call)
+
+### Tracking & Logging Requirements
+
+**Every ZoomInfo operation MUST be logged to Processing_Log:**
+
+```python
+def log_zoominfo_operation(tool_name, records_affected, api_calls_used):
+    """Log every ZoomInfo operation for budget tracking"""
+
+    # Get current running total
+    current_total = get_total_api_calls_from_log()
+    new_total = current_total + api_calls_used
+    remaining = 5000 - new_total
+
+    # Calculate percentage used
+    percentage = (new_total / 5000) * 100
+
+    # Determine status level
+    if percentage >= 90:
+        status = "🚨 CRITICAL"
+    elif percentage >= 80:
+        status = "🔴 RED"
+    elif percentage >= 60:
+        status = "🟡 YELLOW"
+    else:
+        status = "🟢 GREEN"
+
+    # Log to Processing_Log
+    add_rows("Processing_Log", [[
+        timestamp(),
+        f"ZI_{tool_name}",
+        f"{records_affected} records, {api_calls_used} calls, {remaining} remaining ({percentage:.1f}%)",
+        status
+    ]])
+
+    # Alert if entering warning zones
+    if percentage >= 80 and percentage < 90:
+        alert_user(f"⚠️ RED ZONE: {percentage:.1f}% budget consumed")
+    elif percentage >= 90:
+        alert_user(f"🚨 EMERGENCY: {percentage:.1f}% budget consumed - STOPPING")
+```
+
+**Log Format Example:**
+
+| Timestamp | Tool | Details | Status |
+|-----------|------|---------|--------|
+| 2025-10-28 10:30 | ZI_enrich_contact | 50 records, 5 calls, 4995 remaining (0.1%) | 🟢 GREEN |
+| 2025-10-28 11:15 | ZI_enrich_company | 100 records, 10 calls, 4985 remaining (0.3%) | 🟢 GREEN |
+| 2025-10-28 14:00 | ZI_search_contacts | 1 query, 1 call, 4984 remaining (0.3%) | 🟢 GREEN |
+
+### Weekly Usage Verification
+
+**Every Monday, generate usage report:**
+
+```python
+def weekly_zoominfo_report():
+    """Generate weekly ZoomInfo usage report"""
+
+    # Calculate totals
+    week_calls = get_api_calls_this_week()
+    total_calls = get_total_api_calls()
+    remaining = 5000 - total_calls
+    percentage = (total_calls / 5000) * 100
+
+    # Project remaining budget lifespan
+    weeks_elapsed = get_weeks_since_start()
+    weekly_avg = total_calls / weeks_elapsed
+    weeks_remaining = remaining / weekly_avg if weekly_avg > 0 else 999
+
+    report = f"""
+    📊 ZOOMINFO WEEKLY USAGE REPORT
+
+    Week: {get_current_week()}
+    This Week: {week_calls} API calls
+    Project Total: {total_calls} / 5,000 ({percentage:.1f}%)
+    Remaining: {remaining} calls
+
+    Status: {get_status_level(percentage)}
+    Weekly Average: {weekly_avg:.0f} calls/week
+    Projected Lifespan: {weeks_remaining:.1f} weeks
+
+    Top Operations:
+    {get_top_operations_this_week()}
+    """
+
+    # Log report
+    log_to_sheets("Processing_Log", [[
+        timestamp(),
+        "ZI_WEEKLY_REPORT",
+        report,
+        get_status_level(percentage)
+    ]])
+
+    return report
+```
+
+### Monthly Credit Tracking
+
+**ZoomInfo Monthly Credits (separate from API calls):**
+- 12,000 credits reset monthly
+- Used for web portal exports
+- NOT used by MCP API calls
+- Track separately if web portal used
+
+**API Calls vs Credits:**
+- API calls = MCP tool usage (our focus)
+- Credits = Web UI exports (not used in automation)
+- **Project uses API calls only** (no web UI dependency)
+
+### Emergency Stop Procedures
+
+**If budget reaches 90% (4,500 API calls):**
+
+1. **IMMEDIATE HALT**
+   ```python
+   def emergency_stop():
+       """Halt all ZoomInfo operations immediately"""
+       global ZOOMINFO_ENABLED
+       ZOOMINFO_ENABLED = False
+
+       # Log emergency stop
+       log_to_sheets("Processing_Log", [[
+           timestamp(),
+           "ZI_EMERGENCY_STOP",
+           "90% budget threshold reached - all operations halted",
+           "🚨 CRITICAL"
+       ]])
+
+       # Alert user
+       alert_user("🚨 EMERGENCY: ZoomInfo budget 90% consumed - operations stopped")
+
+       # Switch to free-only mode
+       switch_to_free_mode()
+   ```
+
+2. **Switch to 100% Free Sources**
+   - Disable all ZoomInfo MCP tools
+   - Use LinkedIn via Google for remaining contacts
+   - Use free sources for company validation
+   - Document reason for emergency stop
+
+3. **Generate Incident Report**
+   - What caused high usage?
+   - Where did budget go?
+   - Were free alternatives properly used?
+   - What operations consumed most calls?
+
+4. **User Approval Required to Resume**
+   - Present incident report
+   - Justify continuation need
+   - Obtain explicit written approval
+   - Document new safety measures
+
+### Best Practices for Budget Conservation
+
+**DO ✅**
+
+1. **Always use lookup first** before enrichment (may be free)
+2. **Always batch operations** (10 records = 1 call)
+3. **Always check free sources first** (LinkedIn via Google, company websites)
+4. **Always log every operation** to Processing_Log
+5. **Always verify budget** before operations
+6. **Always use conservative estimates** (plan for worst case)
+7. **Always monitor weekly trends** (catch runaway usage early)
+
+**DON'T ❌**
+
+1. **Never skip lookup** before enrichment
+2. **Never enrich individually** when batching possible
+3. **Never use ZoomInfo for primary discovery** (free sources first)
+4. **Never assume budget is sufficient** (always check)
+5. **Never continue after emergency stop** (user approval required)
+6. **Never use ZoomInfo without logging** (breaks tracking)
+7. **Never ignore yellow/red zone warnings** (proactive management required)
+
+### Agent-Specific Budget Allocations
+
+**Agent 1 (Awards Validation):**
+- Budget: 500 API calls (10% of project)
+- Use: Validate award winner companies
+- Throttle: 50 companies per day max
+- Safety: Check budget before batch operations
+
+**Agent 2 (LMS Customer Validation):**
+- Budget: 500 API calls (10% of project)
+- Use: Verify LMS customer company details
+- Throttle: 50 companies per day max
+- Safety: Lookup first, enrich only if missing data
+
+**Agent 5 (Contact Enrichment):**
+- Budget: 2,000 API calls (40% of project - HIGHEST)
+- Use: Add email/phone to discovered contacts
+- Throttle: 200 contacts per day max (20 batches)
+- Safety: Only enrich after LinkedIn via Google exhausted
+
+**Orchestrator (Company Enrichment):**
+- Budget: 1,500 API calls (30% of project)
+- Use: Employee count, revenue, tech stack validation
+- Throttle: 150 companies per day max (15 batches)
+- Safety: Only for tech stack discovery (Tier 3 priority)
+
+**Agent 4 (Targeted Search):**
+- Budget: 500 API calls (10% of project)
+- Use: Fill gaps in discovery (last resort)
+- Throttle: 10 searches per week max
+- Safety: Require explicit justification for each search
+
+### Cost Comparison: Free vs ZoomInfo
+
+**Contact Discovery Example:**
+
+| Method | Source | Data Quality | API Calls | Cost |
+|--------|--------|--------------|-----------|------|
+| Free | LinkedIn via Google | Name + title + company | 0 | $0 |
+| Hybrid | Free + ZoomInfo enrichment | Name + title + company + email + phone | 0.1 per contact | $0 (within budget) |
+
+**200 contacts:**
+- Free: 0 API calls, names only
+- Hybrid: 20 API calls (batches of 10), full contact details
+- **Value Add:** 200% increase in actionability for 0.4% of budget
+
+### Overage Risk Analysis
+
+**Scenarios:**
+
+1. **Conservative Usage (120 calls):**
+   - Risk: NONE (2.4% of budget)
+   - Safety margin: 4,880 calls (97.6%)
+
+2. **Expected Usage (450 calls):**
+   - Risk: NONE (9% of budget)
+   - Safety margin: 4,550 calls (91%)
+
+3. **Budget Limit (5,000 calls):**
+   - Risk: NONE (100% of budget, 0% overage)
+   - Cost: $0 overage fees
+
+4. **Overage Example (6,000 calls):**
+   - Risk: HIGH (120% of budget)
+   - Cost: $10 overage charges (1,000 excess calls ÷ 1,000 × $10)
+   - **MUST AVOID**
+
+**Project Risk Level:** **MINIMAL** (conservative budget, extensive tracking, multiple safety stops)
+
+### Integration with Free Sources
+
+**Hybrid Workflow (Tier 1 - Contact Enrichment):**
+
+```python
+def hybrid_contact_discovery(company_name):
+    """Hybrid workflow: free discovery + ZoomInfo enrichment"""
+
+    # Step 1: Free discovery (LinkedIn via Google)
+    contacts = []
+    queries = [
+        f'site:linkedin.com/in "Chief Learning Officer" {company_name}',
+        f'site:linkedin.com/in "VP Learning" {company_name}',
+        f'site:linkedin.com/in "Head of L&D" {company_name}'
+    ]
+
+    for query in queries:
+        results = google_search_with_delay(query)
+        contacts.extend(extract_linkedin_profiles(results))
+
+    # Step 2: Pre-flight check
+    if not zoominfo_preflight_check("enrich_contact", len(contacts) / 10):
+        return contacts  # Return free data without enrichment
+
+    # Step 3: ZoomInfo enrichment (batch mode)
+    enriched_contacts = []
+    for batch in chunks(contacts, 10):
+        # Try lookup first (may be free)
+        lookup_results = zoominfo_lookup(batch)
+
+        # Enrich batch (1 API call for 10 contacts)
+        enriched_batch = zoominfo_enrich_contact(batch)
+        enriched_contacts.extend(enriched_batch)
+
+        # Log operation
+        log_zoominfo_operation("enrich_contact", len(batch), 1)
+
+    return enriched_contacts
+```
+
+**Outcome:** Free sources provide names (0 cost), ZoomInfo adds email/phone (minimal cost)
+
+---
+
 ## Website Scraping (General)
 
 ### robots.txt Compliance
@@ -548,6 +985,10 @@ def log_rate_metrics(agent_name):
 6. **Use Firecrawl maxAge** for cache hits
 7. **Batch process with rest periods**
 8. **Use LinkedIn via Google** (not direct LinkedIn)
+9. **Use ZoomInfo lookup first** before enrichment (may be free)
+10. **Always batch ZoomInfo operations** (10 records = 1 API call)
+11. **Track every ZoomInfo operation** to Processing_Log
+12. **Check ZoomInfo budget** before every operation
 
 ### DON'T ❌
 
@@ -559,6 +1000,10 @@ def log_rate_metrics(agent_name):
 6. **Never** scrape login-required content
 7. **Never** bypass CAPTCHA challenges
 8. **Never** search LinkedIn directly (use Google)
+9. **Never** use ZoomInfo for primary discovery (free sources first)
+10. **Never** enrich individually when batch mode available
+11. **Never** skip ZoomInfo pre-flight checks
+12. **Never** ignore yellow/red zone budget warnings
 
 ---
 
@@ -579,25 +1024,40 @@ def log_rate_metrics(agent_name):
 
 ### Execution Schedule
 
-**Week 1-2: Low-Risk Agents**
-- Agents 1, 2, 4 complete
+**Week 1-2: Low-Risk Agents (Foundation Building)**
+- Agents 1, 2, 4 complete (free sources only)
 - Build confidence in rate limit management
 - Establish baseline metrics
+- ZoomInfo: 100-200 API calls (validation only)
+- Budget tracking established
 
-**Week 3-5: High-Volume Agent**
+**Week 3-5: High-Volume Agent (Systematic Discovery)**
 - Agent 3 with careful monitoring
 - 5 parallel instances, different IPs if possible
 - 100-150 searches/hour max per instance
+- ZoomInfo: 200-300 API calls (company enrichment)
+- Weekly budget reviews
 
-**Week 6: Contact Discovery**
-- Agent 5 (LinkedIn via Google)
-- 2,000-3,000 searches over 1 week
+**Week 6: Contact Discovery (Primary Enrichment Phase)**
+- Agent 5 (LinkedIn via Google for discovery)
+- 2,000-3,000 Google searches over 1 week
 - ~300 searches/day = well within limits
+- ZoomInfo: 1,500-2,000 API calls (contact enrichment - HIGHEST usage week)
+- Daily budget monitoring (RED zone potential)
 
-**Week 7-8: Validation & Cleanup**
+**Week 7-8: Validation & Cleanup (Minimal ZoomInfo Usage)**
 - Re-scrape flagged pages (use maxAge for cache hits)
 - URL validation
 - Minimal additional searches
+- ZoomInfo: 100-200 API calls (fill gaps only)
+- Final budget verification and reporting
+
+**ZoomInfo Budget Timeline:**
+- Weeks 1-2: ~5-10% of budget (foundation)
+- Weeks 3-5: ~10-15% of budget (company data)
+- Week 6: ~40-50% of budget (contact enrichment peak)
+- Weeks 7-8: ~5-10% of budget (cleanup)
+- **Total Expected:** 120-450 API calls (2-9% of 5,000 budget)
 
 ---
 
@@ -619,6 +1079,41 @@ def log_rate_metrics(agent_name):
 - Use multiple machines (different locations)
 - Each machine: 100 searches/hour
 - 3 machines = 300 searches/hour total
+
+### If ZoomInfo Budget Approaching Limit
+
+**Option 1: Freeze Enrichment (Recommended)**
+- STOP all ZoomInfo enrichment operations
+- Continue with free discovery only
+- Return names/titles without email/phone
+- Impact: 200-400 contacts (names only) vs 250-500 (with email/phone)
+
+**Option 2: Selective Enrichment**
+- Prioritize highest-value contacts only
+- CLO/VP level only (not managers)
+- Fortune 500 companies only (not mid-market)
+- Expected: 100-150 enriched contacts vs 250-500
+
+**Option 3: Extend Timeline**
+- Pause enrichment for 1-2 weeks
+- Monitor other ZoomInfo usage across company
+- Resume when budget availability confirmed
+- No impact on discovery (free sources continue)
+
+**Option 4: Switch to Free Contact Methods**
+- Email pattern guessing (firstname.lastname@company.com)
+- Company website contact pages
+- Press release author emails
+- Quality: 30-40% success rate vs 90% with ZoomInfo
+
+**Decision Tree:**
+```
+Budget Status → Action
+├─ 0-60% (GREEN): Continue as planned
+├─ 60-80% (YELLOW): Selective enrichment only
+├─ 80-90% (RED): Freeze enrichment, alert user
+└─ 90-100% (CRITICAL): Emergency stop, switch to free-only
+```
 
 ### If Firecrawl Costs Too High
 
@@ -646,17 +1141,35 @@ def playwright_scrape(url):
 ## Conclusion
 
 **Rate limiting is manageable with:**
-- 2-5 second delays
-- Batch processing with rest periods
-- LinkedIn via Google (bypasses LinkedIn limits)
-- Firecrawl maxAge for caching
-- Parallel Agent 3 instances
+- 2-5 second delays for free web sources
+- Batch processing with rest periods (Google searches)
+- LinkedIn via Google (bypasses LinkedIn limits entirely)
+- Firecrawl maxAge for caching (50% cost savings)
+- Parallel Agent 3 instances (distributes load)
+- ZoomInfo batch operations (10x efficiency)
+- Comprehensive tracking and alert thresholds
 
-**Expected throttling events:** 0-3 over entire project (if best practices followed)
+**Expected throttling events:**
+- Google: 0-3 events over entire project (if best practices followed)
+- ZoomInfo: 0 events (conservative budget with 97-98% safety margin)
 
-**Project can complete in 6-8 weeks with zero subscription costs and minimal rate limiting issues.**
+**Project can complete in 6-8 weeks with:**
+- **Free Sources:** $0 subscription costs, minimal rate limiting
+- **ZoomInfo Enhancement:** 120-450 API calls (0.2-0.9% annual capacity)
+- **Zero overage risk:** Multiple safety stops prevent budget overrun
+- **Hybrid Advantage:** 250-500 enriched contacts vs 200-400 names-only
+
+**Key Success Factors:**
+1. Free sources provide 80-90% of data (foundation)
+2. ZoomInfo adds 10-20% strategic enhancement (email/phone)
+3. Mandatory pre-flight checks prevent irresponsible usage
+4. Comprehensive tracking enables proactive management
+5. Emergency stops ensure budget compliance
+
+**Risk Level:** **LOW** (conservative budget, extensive guardrails, proven free methodology as fallback)
 
 ---
 
 **Last Updated:** 2025-10-28
-**Next Review:** After Agent 1 & 2 pilot (validate assumptions)
+**Version:** 2.0 (Hybrid Methodology)
+**Next Review:** After Agent 1 & 2 pilot (validate free+ZoomInfo workflows)
